@@ -6,6 +6,7 @@ package com.flatironschool.javacs;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -72,8 +73,17 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		Comparable<? super K> k = (Comparable<? super K>) target;
 		
 		// the actual search
-        // TODO: Fill this in.
-        return null;
+		Node p = root;
+		while (p != null) {
+			int cmp = k.compareTo(p.key);
+			if (cmp < 0)
+				p = p.left;
+			else if (cmp > 0)
+				p = p.right;
+			else
+				return p;
+		}
+		return null;
 	}
 
 	/**
@@ -92,7 +102,7 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object target) {
-		return false;
+		return values().contains(target);
 	}
 
 	@Override
@@ -116,9 +126,20 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	@Override
 	public Set<K> keySet() {
-		Set<K> set = new LinkedHashSet<K>();
-        // TODO: Fill this in.
-		return set;
+		return inorderRecursive(root,keys);
+	}
+
+	LinkedHashSet<K> keys = new LinkedHashSet<K>();
+	private LinkedHashSet<K> inorderRecursive(Node root, LinkedHashSet<K> keys){
+		if (root == null){
+			return null;
+		}
+		else{
+			inorderRecursive(root.left,keys);
+			keys.add(root.key);
+			inorderRecursive(root.right,keys);
+			}
+			return keys;
 	}
 
 	@Override
@@ -135,8 +156,31 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	private V putHelper(Node node, K key, V value) {
-        // TODO: Fill this in.
-        return null;
+		@SuppressWarnings("unchecked")
+		Comparable<? super K> k = (Comparable<? super K>) key;
+		int cmp = k.compareTo(node.key);
+		
+		if (cmp < 0) {
+			if (node.left == null) {
+				node.left = new Node(key, value);
+				size++;
+				return null;
+			} else {
+				return putHelper(node.left, key, value);
+			}
+		}
+		if (cmp > 0) {
+			if (node.right == null) {
+				node.right = new Node(key, value);
+				size++;
+				return null;
+			} else {
+				return putHelper(node.right, key, value);
+			}
+		}
+		V oldValue = node.value;
+		node.value = value;
+		return oldValue;
 	}
 
 	@Override
